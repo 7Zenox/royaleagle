@@ -1,25 +1,106 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import Image from "next/image";
+import StaticContent from "./assets/content"; // Your existing content component
+import SVGComponent from "./assets/SVGComponent";
+import gsap from "gsap";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
+
+gsap.registerPlugin(ScrollTrigger);
 
 const HomePage = () => {
   const [showNavbar, setShowNavbar] = useState(true);
+  // Track totalScrollHeight so the page is tall enough for vertical scrolling
+  const [totalScrollHeight, setTotalScrollHeight] = useState(0);
+
+  // References
+  const pathRef = useRef<SVGPathElement>(null);
+  const pinWrapperRef = useRef<HTMLDivElement>(null);
+  const sectionsRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    let lastScrollY = window.scrollY;
+    const sections = sectionsRef.current;
+    const pinWrapper = pinWrapperRef.current;
 
+    if (!sections || !pinWrapper) return;
+
+    // 1) Calculate total width -> set that as our vertical scrollable height
+    const updateMeasurements = () => {
+      const totalWidth = sections.scrollWidth; // total horizontal width
+      setTotalScrollHeight(totalWidth);
+    };
+    updateMeasurements();
+    window.addEventListener("resize", updateMeasurements);
+
+    // 2) GSAP scroll trigger: pin the container & move horizontally on vertical scroll
+    const ctx = gsap.context(() => {
+      const totalWidth = sections.scrollWidth;
+      const maxHorizontalMovement = totalWidth - window.innerWidth;
+
+      gsap.to(sections, {
+        x: -maxHorizontalMovement,
+        ease: "none",
+        scrollTrigger: {
+          trigger: pinWrapper,
+          start: "top top",
+          // Scroll until we've traversed totalWidth
+          end: totalWidth,
+          scrub: 1,
+          pin: true,
+          anticipatePin: 1,
+          invalidateOnRefresh: true,
+        },
+      });
+    }, pinWrapper);
+
+    // 3) Navbar show/hide + SVG path animation
+    let lastScrollY = window.scrollY;
     const handleScroll = () => {
+      // Navbar visibility logic
       setShowNavbar(window.scrollY <= lastScrollY || window.scrollY < 100);
       lastScrollY = window.scrollY;
+
+      // SVG path stroke dash offset
+      const path = pathRef.current;
+      if (path) {
+        // The vertical distance we can scroll
+        const totalScrollDistance = totalScrollHeight - window.innerWidth;
+        const scrollPosition = window.scrollY;
+        const scrollPercentage = scrollPosition / totalScrollDistance;
+        const pathLength = path.getTotalLength();
+
+        path.style.strokeDashoffset = String(
+          pathLength - pathLength * Math.min(scrollPercentage, 1)
+        );
+      }
     };
 
+    // Initialize the path stroke
+    const path = pathRef.current;
+    if (path) {
+      const pathLength = path.getTotalLength();
+      path.style.strokeDasharray = String(pathLength);
+      path.style.strokeDashoffset = String(pathLength);
+    }
+
     window.addEventListener("scroll", handleScroll);
-    return () => window.removeEventListener("scroll", handleScroll);
-  }, []);
+
+    // Cleanup on unmount
+    return () => {
+      window.removeEventListener("scroll", handleScroll);
+      window.removeEventListener("resize", updateMeasurements);
+      ctx.revert();
+    };
+  }, [totalScrollHeight]);
 
   return (
-    <div className="bg-black text-gray-300">
+    // This outer wrapper uses dynamic minHeight = totalScrollHeight
+    // so we can scroll that full distance vertically.
+    <div
+      className="bg-black text-gray-300 w-full overflow-x-hidden relative"
+      style={{ minHeight: totalScrollHeight }}
+    >
       {/* Navbar */}
       <nav
         className={`fixed top-0 left-0 w-full z-50 bg-black bg-opacity-70 backdrop-blur-md flex justify-between items-center px-8 lg:px-16 py-6 transition-transform duration-300 ${
@@ -29,162 +110,30 @@ const HomePage = () => {
         <div className="flex items-center space-x-4">
           <Image src="/logo.png" alt="Royal Eagle Logo" width={60} height={60} />
           <span className="text-xs lg:text-sm font-luloClean text-gold">
-            Royal Eagle <br/> Investment L.L.C
+            Royal Eagle <br /> Investment L.L.C
           </span>
         </div>
       </nav>
 
-      {/* Hero Section */}
-      <section className="min-h-screen flex flex-col justify-center text-left px-8 lg:px-48">
-        <h1 className="text-4xl lg:text-6xl font-luloClean">
-          Diverse <span className="text-gold">Portfolio Investment</span> Firm
-        </h1>
-        <p className="text-lg lg:text-xl mt-2 text-neutral-500 font font-futura">
-          Investing your capital for your future
-        </p>
-      </section>
+      {/* SVG Scroll Effect */}
+      <div className="fixed w-full h-56 bottom-10 -z-5 items-start justify-center lg:flex overflow-hidden">
+        <SVGComponent ref={pathRef} />
+      </div>
 
-      {/* Our Story Section */}
-      <section className="h-screen grid grid-cols-1 lg:grid-cols-2">
-        <div className="bg-black text-white flex flex-col justify-center px-8 lg:px-16 border-t-2 lg:border-0">
-          <h2 className="text-3xl lg:text-7xl lg:mx-8 font-bold font-luloClean">
-            Our <br /> Story
-          </h2>
+      {/* PINNED WRAPPER: pinned with GSAP, full viewport height */}
+      <div
+        ref={pinWrapperRef}
+        className="sticky top-0 left-0 w-full h-screen overflow-hidden"
+      >
+        {/* 
+          The horizontally stacked sections.
+          If <StaticContent /> has multiple 100vw sections,
+          they must be rendered inside a single .flex container.
+        */}
+        <div ref={sectionsRef} className="flex h-full">
+          <StaticContent />
         </div>
-        <div className="bg-white text-black flex flex-col justify-center px-8 lg:px-16 font-futura">
-          <p className="text-base lg:text-lg leading-relaxed">
-            Royal Eagle is a dynamic and forward-thinking investment firm
-            dedicated to creating lasting value in diverse sectors. With a
-            commitment to excellence and a strategic vision, we have positioned
-            ourselves as a trusted partner for investors seeking growth and
-            stability.
-          </p>
-          <p className="text-base lg:text-lg leading-relaxed mt-4">
-            At Royal Eagle, we recognize the unique opportunities that different
-            sectors present. Our comprehensive approach to investment spans a
-            wide range of industries, allowing us to diversify portfolios and
-            optimize returns for our clients. As a client-centric firm, we
-            prioritize transparency, integrity, and a results-driven mindset to
-            ensure our clients' financial objectives are not only met but
-            exceeded.
-          </p>
-        </div>
-      </section>
-
-      {/* Our Investments Section */}
-      <section className="py-20 px-6 lg:px-16">
-        <div className="container mx-auto">
-          <h2 className="text-xl lg:text-5xl font-bold mb-8 font-luloClean text-center">
-            Our Investments
-          </h2>
-          <div className="grid grid-cols-1 gap-8 lg:py-10 lg:px-32">
-            {[
-              {
-                number: "01",
-                title: "Commercial Enterprises & Management",
-                description:
-                  "We specialize in identifying and investing in high-potential commercial enterprises, offering strategic management support to drive growth, enhance operational efficiency, and maximize profitability.",
-              },
-              {
-                number: "02",
-                title: "Industrial Enterprises & Management",
-                description:
-                  "Our firm actively seeks investment opportunities in industrial enterprises, leveraging our industry insight and operational expertise to support these businesses in achieving sustainable growth and competitiveness.",
-              },
-              {
-                number: "03",
-                title: "Agricultural Enterprises & Management",
-                description:
-                  "We recognize the critical role agriculture plays in global economies. We invest in agricultural enterprises, providing management solutions to enhance productivity, promote sustainable practices, and capitalize on emerging market trends.",
-              },
-              {
-                number: "04",
-                title: "Oil & Natural Gas Projects",
-                description:
-                  "Navigating the complex landscape of the energy sector, we specialize in investing in oil and natural gas projects. Our team is adept at identifying lucrative opportunities, managing risk, and ensuring our investments align with evolving industry dynamics.",
-              },
-              {
-                number: "05",
-                title: "Educational Enterprises & Management",
-                description:
-                  "Education is a cornerstone of societal progress. We invest in educational enterprises, supporting innovation and excellence in education, and providing strategic management to foster the development of future leaders.",
-              },
-              {
-                number: "06",
-                title: "Tourist Enterprises & Management",
-                description:
-                  "With a keen understanding of the tourism industry, we invest in tourist enterprises, promoting sustainable and memorable experiences. Our management approach is designed to enhance customer satisfaction and drive long-term value for stakeholders.",
-              },
-              {
-                number: "07",
-                title: "Retail Trade Enterprises & Management",
-                description:
-                  "In the dynamic world of retail, we invest in trade enterprises, bringing a strategic approach to management that focuses on customer engagement, supply chain optimization, and steady market growth.",
-              },
-              {
-                number: "08",
-                title: "Energy Enhancement Programs",
-                description:
-                  "As the global demand for energy grows, we invest in energy enhancement programs that prioritize sustainability and innovation. These programs focus on optimizing energy efficiency and adopting renewable technologies.",
-              },
-              {
-                number: "09",
-                title: "Specialization in Bank Notes and Financial Instruments",
-                description:
-                  "As specialists in bank notes like bank guarantees, LC (Letter of Credit), and SBLC (Standby Letter of Credit), we operate directly with large lending institutions, affiliated corporate consortiums, and providers of bank financial instruments.",
-              },
-              {
-                number: "10",
-                title: "Money Enhancement Programs and Forex Trade Modules",
-                description:
-                  "In addition to traditional investments, we offer money enhancement programs encompassing low to high-value funds for humanity projects on non-recourse terms. Our commitment to fostering positive societal impact is reflected in our support for projects that contribute to the betterment of communities.",
-              },
-            ].map(({ number, title, description }, idx) => (
-              <div key={idx} className="grid grid-cols-12 gap-4 items-center ">
-                <div className="col-span-2 text-right">
-                  <h3 className="text-5xl lg:text-8xl text-gold font-oswaldmd">
-                    {number}
-                  </h3>
-                </div>
-                <div className="col-span-10 text-left lg:ml-4">
-                  <h4 className="text-xs lg:text-xl font-luloClean">{title}</h4>
-                  <p className="text-xs lg:text-sm mt-1 font-futura text-gray-500">
-                    {description}
-                  </p>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Footer Section */}
-      <footer className="bg-black text-gray-300 py-12 px-16">
-        <div className="container mx-auto flex flex-wrap justify-between items-center border-t border-gray-600 pt-6">
-          <div className="flex flex-col items-center w-full md:w-1/3 mb-4 md:mb-0 text-center">
-            <h5 className="text-sm lg:text-base font-luloClean">Address</h5>
-            <p className="text-sm lg:text-base font-futura text-gray-500">
-              Office No. 104A6, Deira – Al Garhoud, Dubai, UAE
-            </p>
-          </div>
-          <div className="flex flex-col items-center w-full md:w-1/3 mb-4 md:mb-0 text-center">
-            <h5 className="text-sm lg:text-base font-luloClean">Phone</h5>
-            <p className="text-sm lg:text-base font-futura text-gray-500">
-              +971 58 6081986
-            </p>
-          </div>
-          <div className="flex flex-col items-center w-full md:w-1/3 text-center">
-            <h5 className="text-sm lg:text-base font-luloClean">Email</h5>
-            <p className="text-sm lg:text-base font-futura text-gray-500">
-              info@royaleagleinvestment.com
-            </p>
-          </div>
-        </div>
-        <div className="text-center mt-6 text-xs lg:text-sm text-gray-500">
-          Royal Eagle Investments L.L.C, registered under Dubai, United Arab
-          Emirates 2023
-        </div>
-      </footer>
+      </div>
     </div>
   );
 };
