@@ -119,7 +119,7 @@ const StaticContent = () => {
             wide range of industries, allowing us to diversify portfolios and
             optimize returns for our clients. As a client-centric firm, we
             prioritize transparency, integrity, and a results-driven mindset to
-            ensure our clients' financial objectives are not only met but
+            ensure our clients&apos; financial objectives are not only met but
             exceeded.
           </p>
         </div>
