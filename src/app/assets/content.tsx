@@ -6,43 +6,43 @@ const StaticContent = () => {
   const investments = [
     {
       number: "01",
-      title: "Commercial Enterprises &amp; Management",
+      title: "Commercial Enterprises & Management",
       description:
         "We specialize in identifying and investing in high-potential commercial enterprises, offering strategic management support to drive growth, enhance operational efficiency, and maximize profitability.",
     },
     {
       number: "02",
-      title: "Industrial Enterprises &amp; Management",
+      title: "Industrial Enterprises & Management",
       description:
         "Our firm actively seeks investment opportunities in industrial enterprises, leveraging our industry insight and operational expertise to support these businesses in achieving sustainable growth and competitiveness.",
     },
     {
       number: "03",
-      title: "Agricultural Enterprises &amp; Management",
+      title: "Agricultural Enterprises & Management",
       description:
         "We recognize the critical role agriculture plays in global economies. We invest in agricultural enterprises, providing management solutions to enhance productivity, promote sustainable practices, and capitalize on emerging market trends.",
     },
     {
       number: "04",
-      title: "Oil &amp; Natural Gas Projects",
+      title: "Oil & Natural Gas Projects",
       description:
         "Navigating the complex landscape of the energy sector, we specialize in investing in oil and natural gas projects. Our team is adept at identifying lucrative opportunities, managing risk, and ensuring our investments align with evolving industry dynamics.",
     },
     {
       number: "05",
-      title: "Educational Enterprises &amp; Management",
+      title: "Educational Enterprises & Management",
       description:
         "Education is a cornerstone of societal progress. We invest in educational enterprises, supporting innovation and excellence in education, and providing strategic management to foster the development of future leaders.",
     },
     {
       number: "06",
-      title: "Tourist Enterprises &amp; Management",
+      title: "Tourist Enterprises & Management",
       description:
         "With a keen understanding of the tourism industry, we invest in tourist enterprises, promoting sustainable and memorable experiences. Our management approach is designed to enhance customer satisfaction and drive long-term value for stakeholders.",
     },
     {
       number: "07",
-      title: "Retail Trade Enterprises &amp; Management",
+      title: "Retail Trade Enterprises & Management",
       description:
         "In the dynamic world of retail, we invest in trade enterprises, bringing a strategic approach to management that focuses on customer engagement, supply chain optimization, and steady market growth.",
     },
@@ -54,13 +54,13 @@ const StaticContent = () => {
     },
     {
       number: "09",
-      title: "Specialization in Bank Notes and Financial Instruments",
+      title: "Specialization in Bank Notes & Financial Instruments",
       description:
         "As specialists in bank notes like bank guarantees, LC (Letter of Credit), and SBLC (Standby Letter of Credit), we operate directly with large lending institutions, affiliated corporate consortiums, and providers of bank financial instruments.",
     },
     {
       number: "10",
-      title: "Money Enhancement Programs and Forex Trade Modules",
+      title: "Money Enhancement Programs & Forex Trade Modules",
       description:
         "In addition to traditional investments, we offer money enhancement programs encompassing low to high-value funds for humanity projects on non-recourse terms. Our commitment to fostering positive societal impact is reflected in our support for projects that contribute to the betterment of communities.",
     },
