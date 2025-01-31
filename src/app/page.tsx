@@ -1,11 +1,8 @@
-// HomePage.jsx
-
 "use client";
 
 import React, { useEffect, useState, useRef } from "react";
 import Image from "next/image";
 import StaticContent from "./assets/content";
-import SVGComponent from "./assets/SVGComponent";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 
@@ -14,7 +11,6 @@ gsap.registerPlugin(ScrollTrigger);
 export default function HomePage() {
   const [showNavbar, setShowNavbar] = useState(true);
   const [totalScrollHeight, setTotalScrollHeight] = useState(0);
-  const pathRef = useRef<SVGPathElement>(null);
   const pinWrapperRef = useRef<HTMLDivElement>(null);
   const sectionsRef = useRef<HTMLDivElement>(null);
 
@@ -52,23 +48,7 @@ export default function HomePage() {
     const handleScroll = () => {
       setShowNavbar(window.scrollY <= lastScrollY || window.scrollY < 100);
       lastScrollY = window.scrollY;
-
-      const path = pathRef.current;
-      if (path) {
-        const scrollDist = totalScrollHeight - window.innerWidth;
-        const scrolled = window.scrollY;
-        const pct = scrolled / scrollDist;
-        const length = path.getTotalLength();
-        path.style.strokeDashoffset = String(length - length * Math.min(pct, 1));
-      }
     };
-
-    const path = pathRef.current;
-    if (path) {
-      const length = path.getTotalLength();
-      path.style.strokeDasharray = String(length);
-      path.style.strokeDashoffset = String(length);
-    }
 
     window.addEventListener("scroll", handleScroll);
     return () => {
@@ -95,10 +75,6 @@ export default function HomePage() {
           </span>
         </div>
       </nav>
-
-      <div className="fixed w-full h-56 bottom-10 -z-5 items-start justify-center lg:flex overflow-hidden">
-        <SVGComponent ref={pathRef} />
-      </div>
 
       <div
         ref={pinWrapperRef}

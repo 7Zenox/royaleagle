@@ -127,7 +127,7 @@ const StaticContent = () => {
       </section>
 
       {/* SLIDE 3: Investments (chunk1) */}
-      <section className="w-screen h-screen flex-shrink-0 overflow-y-auto py-20 px-8 lg:px-16">
+      <section className="w-screen h-screen flex-shrink-0 overflow-y-auto pt-28 px-8 lg:px-16">
         <div className="container mx-auto">
           {/* "Our Investments" heading only appears here */}
           <h2 className="text-xl lg:text-5xl font-bold mb-8 font-luloClean text-center">
@@ -155,7 +155,7 @@ const StaticContent = () => {
       </section>
 
       {/* SLIDE 4: Investments (chunk2) */}
-      <section className="w-screen h-screen flex-shrink-0 overflow-y-auto py-20 px-6 lg:px-16">
+      <section className="w-screen h-screen flex-shrink-0 overflow-y-auto pt-28 px-6 lg:px-16">
         <div className="container mx-auto">
           <div className="grid grid-cols-1 gap-8 lg:py-10 lg:px-32">
             {chunk2.map(({ number, title, description }, idx) => (
@@ -178,7 +178,7 @@ const StaticContent = () => {
       </section>
 
       {/* SLIDE 5: Investments (chunk3) */}
-      <section className="w-screen h-screen flex-shrink-0 overflow-y-auto py-20 px-6 lg:px-16">
+      <section className="w-screen h-screen flex-shrink-0 overflow-y-auto pt-28 px-6 lg:px-16">
         <div className="container mx-auto">
           <div className="grid grid-cols-1 gap-8 lg:py-10 lg:px-32">
             {chunk3.map(({ number, title, description }, idx) => (
